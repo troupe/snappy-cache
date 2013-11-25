@@ -1,0 +1,24 @@
+{
+  "name": "snappy-cache",
+  "version": "0.0.1",
+  "description": "Redis caching with snappy",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "keywords": [
+    "redis",
+    "cache",
+    "snappy",
+    "caching"
+  ],
+  "author": "Andrew Newdigate",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "snappy": "~2.1.1",
+    "redis": "~0.9.1"
+  },
+  "devDependencies": {
+    "mocha": "~1.14.0"
+  }
+}
