@@ -158,4 +158,42 @@ describe('snappy-cache', function() {
 
     });
   });
+
+  it('should handle cache-hits for very long json strings', function(done) {
+    var sc = new SnappyCache({ prefix: 'snappy-cache-test:' });
+
+    sc.invalidate('5', function(err) {
+      if(err) return done(err);
+      var missCount = 0;
+
+      function lookupFunction(cb) {
+        process.nextTick(function() {
+          missCount++;
+          var longArray = [];
+          for(var i = 0; i < 1000; i++) {
+            longArray[i] = { index: i, string: 'pos: ' + i };
+          }
+
+          cb(void 0, longArray);
+        });
+
+      }
+
+      sc.lookup('5', lookupFunction, function(err, result) {
+        if(err) return done(err);
+        assert.equal(result.length, 1000);
+        assert.equal(missCount, 1);
+
+        sc.lookup('5', lookupFunction, function(err, result) {
+          if(err) return done(err);
+          assert.equal(result.length, 1000);
+          assert.equal(missCount, 1);
+          done();
+
+        });
+
+      });
+
+    });
+  });
 });
