@@ -1,7 +1,8 @@
 var snappyCodec = require('../lib/codecs/snappy');
 var assert = require('assert');
 
-describe('snappy-codec', function() {
+
+describe.skip('snappy-codec', function() {
   it('should encode short values', function(done) {
 
     snappyCodec.encode({ a: 1 }, function(err, v) {

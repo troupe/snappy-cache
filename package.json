@@ -4,7 +4,7 @@
   "description": "Redis caching with snappy",
   "main": "index.js",
   "scripts": {
-    "test": "make test"
+    "test": "mocha --reporter spec --recursive test"
   },
   "keywords": [
     "redis",
@@ -12,14 +12,18 @@
     "snappy",
     "caching"
   ],
-  "author": "Andrew Newdigate",
+  "author": {
+    "name": "Andrew Newdigate"
+  },
   "license": "BSD-2-Clause",
   "dependencies": {
     "snappy": "~2.1.1",
     "redis": "~0.9.1"
   },
   "devDependencies": {
-    "mocha": "~1.14.0"
+    "mocha": "~1.14.0",
+    "fakeredis": "^0.2.1",
+    "jsmockito": "^1.0.5"
   },
   "directories": {
     "test": "test"
@@ -30,5 +34,14 @@
   },
   "bugs": {
     "url": "https://github.com/troupe/snappy-cache/issues"
-  }
+  },
+  "readme": "Snappy-Cache\n=================\n\nA tiny nodejs module for caching values in Redis. Uses Google's snappy\nalgorithm to compress values before they're stored in Redis.\n\nExamples:\n\n\nCreate a cache:\n---------------\n\n```\nvar sc = new SnappyCache({\n  prefix: 'snappy-cache-test:', /* Redis key prefix */\n  ttl: 60, /* TTL in seconds, can also be function(key) -> ttl in seconds */\n  redis: redisClient /* Optional. Will connect to localhost if not specified */\n});\n```\n\nLookup a value:\n---------------\n```\n/* This function is used for cache misses */\nfunction lookupFunction(cb) {\n  process.nextTick(function() {\n    cb(null, 1);\n  });\n}\n\nsc.lookup('value-1', lookupFunction, function(err, result) {\n  // ...\n});\n```\n\nInvalidate a key:\n-----------------\n\n```\nfunction lookupFunction(cb) {\n  process.nextTick(function() {\n    cb(null, 1);\n  });\n}\n\nsc.invalidate('value-1', function(err) {\n  // ...\n});\n```\n\n\n",
+  "readmeFilename": "README.md",
+  "homepage": "https://github.com/troupe/snappy-cache",
+  "_id": "snappy-cache@0.0.4",
+  "dist": {
+    "shasum": "4c03eb727cf77a321d099aef264d34c60f4e82da"
+  },
+  "_from": "snappy-cache@0.0.4",
+  "_resolved": "https://registry.npmjs.org/snappy-cache/-/snappy-cache-0.0.4.tgz"
 }

@@ -1,4 +1,4 @@
 .PHONY: test
 
 test:
-	./node_modules/.bin/mocha --recursive test/
+	npm test

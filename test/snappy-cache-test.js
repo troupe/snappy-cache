@@ -196,4 +196,13 @@ describe('snappy-cache', function() {
 
     });
   });
+
+  it('should handle two-tier caching policy', function() {
+    var sc = new SnappyCache({
+      prefix: 'snappy-cache-test:',
+      policy: 'two-tier'
+    });
+    var TwoTierCachePolicy = require('../lib/cache-policy/two-tier');
+    assert(sc.policy instanceof TwoTierCachePolicy);
+  });
 });
