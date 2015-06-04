@@ -1,9 +1,23 @@
 var SnappyCache = require('../lib/snappy-cache');
 var assert = require('assert');
 
+function createCache(done) {
+  var sc = new SnappyCache({ prefix: 'snappy-cache-test:' });
+  sc.on('persistenceError', function(err) {
+    console.trace();
+    console.error('Persistence Error', err);
+    throw err;
+  });
+  sc.on('decodeError', function(err) {
+    console.error('Decode Error', err);
+    throw err;
+  });
+  return sc;
+}
+
 describe('snappy-cache', function() {
   it('should handle cache-misses', function(done) {
-    var sc = new SnappyCache({ prefix: 'snappy-cache-test:' });
+    var sc = createCache(done);
 
     sc.invalidate('1', function(err) {
       if(err) return done(err);
@@ -23,7 +37,7 @@ describe('snappy-cache', function() {
   });
 
   it('should handle cache-hits', function(done) {
-    var sc = new SnappyCache({ prefix: 'snappy-cache-test:' });
+    var sc = createCache(done);
 
     sc.invalidate('2', function(err) {
       if(err) return done(err);
@@ -42,13 +56,16 @@ describe('snappy-cache', function() {
         assert.equal(result, 2);
         assert.equal(missCount, 1);
 
-        sc.lookup('2', lookupFunction, function(err, result) {
-          if(err) return done(err);
-          assert.equal(result, 2);
-          assert.equal(missCount, 1);
-          done();
+        setTimeout(function(x) {
+          sc.lookup('2', lookupFunction, function(err, result) {
+            if(err) return done(err);
+            assert.equal(result, 2);
+            assert.equal(missCount, 1);
+            done();
 
-        });
+          });
+        }, 10);
+
 
       });
 
@@ -56,7 +73,7 @@ describe('snappy-cache', function() {
   });
 
   it('should handle nulls', function(done) {
-    var sc = new SnappyCache({ prefix: 'snappy-cache-test:' });
+    var sc = createCache(done);
 
     sc.invalidate('3', function(err) {
       if(err) return done(err);
@@ -75,13 +92,16 @@ describe('snappy-cache', function() {
         assert.strictEqual(result, null);
         assert.equal(missCount, 1);
 
-        sc.lookup('3', lookupFunction, function(err, result) {
-          if(err) return done(err);
-          assert.strictEqual(result, null);
-          assert.equal(missCount, 1);
+        setTimeout(function() {
+          sc.lookup('3', lookupFunction, function(err, result) {
+            if(err) return done(err);
+            assert.strictEqual(result, null);
+            assert.equal(missCount, 1);
 
-          done();
-        });
+            done();
+          });
+
+        }, 10);
 
       });
 
@@ -89,7 +109,7 @@ describe('snappy-cache', function() {
   });
 
   it('should handle undefineds', function(done) {
-    var sc = new SnappyCache({ prefix: 'snappy-cache-test:' });
+    var sc = createCache(done);
 
     sc.invalidate('4', function(err) {
       if(err) return done(err);
@@ -108,13 +128,16 @@ describe('snappy-cache', function() {
         assert.strictEqual(result, undefined);
         assert.equal(missCount, 1);
 
-        sc.lookup('4', lookupFunction, function(err, result) {
-          if(err) return done(err);
-          assert.strictEqual(result, undefined);
-          assert.equal(missCount, 1);
+        setTimeout(function() {
+          sc.lookup('4', lookupFunction, function(err, result) {
+            if(err) return done(err);
+            assert.strictEqual(result, undefined);
+            assert.equal(missCount, 1);
 
-          done();
-        });
+            done();
+          });
+        }, 10);
+
 
       });
 
@@ -122,7 +145,7 @@ describe('snappy-cache', function() {
   });
 
   it('should handle invalidation', function(done) {
-    var sc = new SnappyCache({ prefix: 'snappy-cache-test:' });
+    var sc = createCache(done);
 
     sc.invalidate('4', function(err) {
       if(err) return done(err);
@@ -141,17 +164,20 @@ describe('snappy-cache', function() {
         assert.strictEqual(result, 1);
         assert.equal(missCount, 1);
 
-        sc.invalidate('4', function(err) {
+        setTimeout(function() {
+          sc.invalidate('4', function(err) {
 
-          sc.lookup('4', lookupFunction, function(err, result) {
-            if(err) return done(err);
-            assert.strictEqual(result, 2);
-            assert.equal(missCount, 2);
+            sc.lookup('4', lookupFunction, function(err, result) {
+              if(err) return done(err);
+              assert.strictEqual(result, 2);
+              assert.equal(missCount, 2);
 
-            done();
+              done();
+            });
           });
 
-        });
+        }, 10);
+
 
 
       });
@@ -160,7 +186,7 @@ describe('snappy-cache', function() {
   });
 
   it('should handle cache-hits for very long json strings', function(done) {
-    var sc = new SnappyCache({ prefix: 'snappy-cache-test:' });
+    var sc = createCache(done);
 
     sc.invalidate('5', function(err) {
       if(err) return done(err);
@@ -184,13 +210,14 @@ describe('snappy-cache', function() {
         assert.equal(result.length, 1000);
         assert.equal(missCount, 1);
 
-        sc.lookup('5', lookupFunction, function(err, result) {
-          if(err) return done(err);
-          assert.equal(result.length, 1000);
-          assert.equal(missCount, 1);
-          done();
-
-        });
+        setTimeout(function() {
+          sc.lookup('5', lookupFunction, function(err, result) {
+            if(err) return done(err);
+            assert.equal(result.length, 1000);
+            assert.equal(missCount, 1);
+            done();
+          });
+        }, 10);
 
       });
 
