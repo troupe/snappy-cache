@@ -1,6 +1,6 @@
 {
   "name": "snappy-cache",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Redis caching with snappy",
   "main": "index.js",
   "scripts": {
