@@ -76,5 +76,42 @@ describe('json-codec', function() {
     }
   });
 
+  describe('benchmark', function() {
+    var i;
+    var small = [];
+    var medium = [];
+    var large = [];
+
+    for(i = 0; i < 1000; i++) {
+      if (i < 10) small.push({ hello: 'world' + i });
+      if (i < 100) medium.push({ hello: 'world' + i });
+      large.push({ hello: 'world' + i });
+    }
+
+    function doBenchmark(name, data) {
+      it(name, function(done) {
+        var count = 500;
+
+        (function next() {
+          if (!--count) return done();
+          jsonCodec.encode(data, function(err, v) {
+            if(err) return done(err);
+
+            jsonCodec.decode(v, function(err, w) {
+              if(err) return done(err);
+              next();
+            });
+
+          });
+        })();
+      });
+    }
+
+    doBenchmark('small', small);
+    doBenchmark('medium', medium);
+    doBenchmark('large', large);
+  });
+
+
 
 });
