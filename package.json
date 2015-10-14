@@ -17,8 +17,9 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
+    "debug": "^2.0.0",
     "redis": "^0.12.1",
-    "snappy": "^4.0.0"
+    "snappy": "^4.0.3"
   },
   "devDependencies": {
     "mocha": "~1.14.0",
