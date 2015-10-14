@@ -8,7 +8,7 @@ describe('snappy-codec', function() {
     snappyCodec.encode({ a: 1 }, function(err, v) {
       if(err) return done(err);
 
-      snappyCodec.decode("" + v, function(err, w) {
+      snappyCodec.decode(v, function(err, w) {
         if(err) return done(err);
 
         assert.deepEqual(w, { a: 1 });
@@ -42,7 +42,7 @@ describe('snappy-codec', function() {
     snappyCodec.encode({ a: 'ā…æ∞ℳ' }, function(err, v) {
       if(err) return done(err);
 
-      snappyCodec.decode("" + v, function(err, w) {
+      snappyCodec.decode(v, function(err, w) {
         if(err) return done(err);
 
         assert.deepEqual(w, { a: 'ā…æ∞ℳ' });
