@@ -9,14 +9,18 @@ var once = JsMockito.Verifiers.once();
 var twice = JsMockito.Verifiers.times(2);
 
 describe('two-tier', function() {
-  var codec, underTest;
+  var codec, underTest, redis;
 
   beforeEach(function() {
     codec = require('../lib/codecs/json');
+    redis = fakeredis.createClient(null, null, { fast: true });
     underTest = new TwoTierCachePolicy({
       prefix: 'snappy-cache-test:',
-      redisClient: fakeredis.createClient(null, null, { fast: true }),
+      redisClient: redis,
       codec: codec,
+      cache: {
+        emit: function() {}
+      },
       hotTTL: 0.01, /* 10ms */
       coolTTL: 0.1, /* 100ms */
       coolRefetchTimeout: 0.05 /* 50ms */
@@ -93,7 +97,6 @@ describe('two-tier', function() {
     });
   });
 
-
   it('should handle cool-hits where the backend looses the race', function(done) {
     var mockFunc = JsMockito.mockFunction();
 
@@ -138,6 +141,50 @@ describe('two-tier', function() {
         });
 
       }, 15);
+    });
+  });
+
+
+  it('should handle persistence failures', function(done) {
+    var mockFunc = JsMockito.mockFunction();
+
+    var count = 0;
+    JsMockito.when(mockFunc)().then(function(callback) {
+      count++;
+      if (count <= 3) {
+        setTimeout(function() {
+          return callback(null, "fred " + count);
+        }, 10);
+        return;
+      }
+
+      assert(false, 'Too many calls: ' + count);
+    });
+
+    redis.mget = function() {
+      var callback = arguments[arguments.length - 1];
+      callback(new Error('Unable to connect'));
+    };
+
+    underTest.get('5', mockFunc, function(err, result) {
+      if(err) return done(err);
+
+      assert.strictEqual('fred 1', result);
+
+      underTest.get('5', mockFunc, function(err, result) {
+        if(err) return done(err);
+
+        assert.strictEqual('fred 2', result);
+
+        underTest.get('5', mockFunc, function(err, result) {
+          if(err) return done(err);
+
+          assert.strictEqual('fred 3', result);
+          done();
+        });
+
+      });
+
     });
   });
 
