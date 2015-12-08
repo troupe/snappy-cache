@@ -3,8 +3,8 @@ var assert = require('assert');
 
 
 describe('snappy-cache', function() {
-  makeTests('json');
-  makeTests('snappy');
+  makeTests(require('../lib/codecs/json'));
+  makeTests(require('snappy-cache-snappy-codec'));
 
   function makeTests(codec) {
     function createCache(done) {

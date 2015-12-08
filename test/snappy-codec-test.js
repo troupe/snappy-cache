@@ -1,4 +1,4 @@
-var snappyCodec = require('../lib/codecs/snappy');
+var snappyCodec = require('snappy-cache-snappy-codec');
 var assert = require('assert');
 
 
